@@ -1,0 +1,76 @@
+name: inxtamanager
+description: "Version Manager for Inxta"
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.6.0
+
+dependencies:
+  android_intent_plus: ^5.2.1
+  audioplayers: ^6.1.0
+  device_info_plus: ^11.2.0
+  dio: ^5.7.0
+  flutter:
+    sdk: flutter
+  # flutter_app_installer: ^1.0.0
+  flutter_launcher_icons: ^0.14.2
+  http: ^1.2.2
+  open_file: ^3.5.10
+  path_provider: ^2.1.5
+  permission_handler: ^11.3.1
+  # url_launcher: ^6.3.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+  - assets/fonts/
+  - assets/icon/
+  - assets/logo512.png
+  - assets/sounds/click.wav
+
+  fonts:
+    - family: InstagramSans
+      fonts:
+        - asset: assets/fonts/InstagramSans.ttf
+          weight: 400
+
+        - asset: assets/fonts/InstagramSansLight.ttf
+          weight: 300
+
+        - asset: assets/fonts/InstagramSansMedium.ttf
+          weight: 500
+
+        - asset: assets/fonts/InstagramSansBold.ttf
+          weight: 700
+    - family: InstagramSansHeadline
+      fonts:
+        - asset: assets/fonts/InstagramSansHeadline.otf
+          weight: 400
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  image_path: "assets/icon/icon.png"
+  adaptive_icon_foreground: "assets/icon/icon.png"
+  adaptive_icon_background: "#ffffff"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  web:
+    generate: true
+    image_path: "assets/icon/icon.png"
+    background_color: "#ffffff"
+    theme_color: "#3f51b5"
+  windows:
+    generate: true
+    image_path: "assets/icon/icon.png"
+    icon_size: 48 # min:48, max:256, default: 48
+  macos:
+    generate: true
+    image_path: "assets/icon/icon.png"
