@@ -10,6 +10,7 @@ import 'package:audioplayers/audioplayers.dart';
 import '../models/version.dart';
 import '../widgets/download_progress.dart';
 // import '../widgets/version_dropdown.dart';
+// import '../services/version_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -32,8 +33,9 @@ class _HomePageState extends State<HomePage> {
     initializeApp();
   }
 
+  // initializing at app startup
   Future<void> initializeApp() async {
-    await _checkAndRequestStoragePermission();
+    // await _checkAndRequestStoragePermission(); // for asking permission at startup
     await fetchVersions().then((fetchedVersions) {
       setState(() {
         versions = fetchedVersions;
@@ -53,6 +55,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  // requesting permission based on sdk version
   Future<bool>_requestPermission(Permission permission) async {
     AndroidDeviceInfo build=await DeviceInfoPlugin().androidInfo;
     if(build.version.sdkInt>=30){
@@ -81,10 +84,17 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  // downloadButton function checks for storage permission and then downloads
+  Future<void> downloadButton() async {
+    await _checkAndRequestStoragePermission(); // prompt storage permission
+    await downloadFile(); // start downloading
+  }
+
   Future<List<Version>> fetchVersions() async {
     final response =
         await http.get(Uri.parse('https://dl.dashnyam.com/inxtalog.json'));
 
+    // decodes json into Version objects if response was 20(OK)
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
       return data.map((json) => Version.fromJson(json)).toList();
@@ -93,15 +103,18 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> downloadFile() async {
-    await _audioPlayer.play(AssetSource('sounds/click.wav'));
+  Future<void> downloadFile() async { // main download function
+    await _audioPlayer.play(AssetSource('sounds/click.wav')); // play sound
 
+    // showing message when current selected version is null
     if (selectedVersion == null) {
       _showSnackBar('Please select a version to download.');
       return;
     }
 
-    final dio = Dio();
+    final dio = Dio(); // starting dio
+
+    // finds selected version or returns a blank Version object as a fallback
     final version = versions.firstWhere(
       (v) => v.version == selectedVersion,
       orElse: () => Version(
@@ -109,18 +122,22 @@ class _HomePageState extends State<HomePage> {
     );
 
     final directory = await getDownloadDirectory();
+
+    // return message if getting download directory was unsuccessful/null
     if (directory == null) {
       _showSnackBar('Unable to access downloads directory.');
       return;
     }
 
-    final filePath = '${directory.path}/inxta${selectedVersion!}.apk';
+    final filePath = '${directory.path}/inxta${selectedVersion!}.apk'; // save file as
     try {
+      // download start
       setState(() {
         isDownloading = true;
         downloadProgress = 0.0;
       });
 
+      // updating downloadProgress based on received data and total size
       await dio.download(version.downloadLink, filePath,
           onReceiveProgress: (received, total) {
         if (total != -1) {
@@ -130,6 +147,7 @@ class _HomePageState extends State<HomePage> {
         }
       });
 
+      // after completion
       _showSnackBar('Download complete: $filePath');
     } catch (e) {
       _showSnackBar('Download failed: $e');
@@ -141,6 +159,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<Directory?> getDownloadDirectory() async {
+    // specifying download directory for platforms
     if (Platform.isAndroid) {
       return Directory('/storage/emulated/0/Download');
     } else if (Platform.isIOS) {
@@ -149,6 +168,7 @@ class _HomePageState extends State<HomePage> {
     return null;
   }
 
+  // snackbar component for displaying messages below
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message, style: TextStyle(fontFamily: 'InstagramSans', fontSize: 16),)));
   }
@@ -232,7 +252,7 @@ class _HomePageState extends State<HomePage> {
                         width: double.infinity,
                         height: 55,
                         child: ElevatedButton( // download button
-                          onPressed: isDownloading ? null : downloadFile,
+                          onPressed: isDownloading ? null : downloadButton, // downloadButton function checks for storage permission and then downloads if granted
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.black,
                             shape: RoundedRectangleBorder( // rounding the edges
