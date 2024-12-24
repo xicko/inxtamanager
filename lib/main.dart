@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'screens/home_page.dart';
+import 'base_screen.dart';
+import 'package:get/get.dart';
+import 'package:inxtamanager/base_controller.dart';
 
 void main() {
+  Get.put<BaseController>(BaseController());
   runApp(const MainApp());
 }
 
@@ -11,7 +14,7 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: const HomePage(),
+      home: const BaseScreen(),
       theme: ThemeData(
         scaffoldBackgroundColor: const Color(0xFFF5F5F5), // grey 100
         snackBarTheme: SnackBarThemeData(
