@@ -1,7 +1,7 @@
 name: inxtamanager
 description: "Version Manager for Inxta"
 publish_to: 'none'
-version: 0.1.0
+version: 1.0.0
 
 environment:
   sdk: ^3.6.0
@@ -14,6 +14,7 @@ dependencies:
   dio: ^5.7.0
   flutter:
     sdk: flutter
+  flutter_downloader: ^1.11.8
   flutter_launcher_icons: ^0.14.2
   get: ^4.6.6
   http: ^1.2.2

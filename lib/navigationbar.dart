@@ -8,8 +8,6 @@ class BottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() => NavigationBar(
-          indicatorColor: Color.fromARGB(255, 0, 0, 0),
-          backgroundColor: Color.fromARGB(255, 255, 255, 255),
           elevation: 10,
           // height: 120,
           // animationDuration: Duration(seconds: 2),

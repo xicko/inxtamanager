@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+// import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
 import 'package:installed_apps/app_info.dart';
@@ -35,8 +36,10 @@ class _HomePageState extends State<HomePage> {
   List<Version> versions = [];
   double downloadProgress = 0.0;
   bool isDownloading = false;
+  bool fileExists = false;
   bool loading = true;
   bool isAppInstalled = false;
+   bool _isSnackBarVisible = false; // flag to track snackbar is currently active
   String _updateStatus = "Checking for updates...";
   
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -59,8 +62,8 @@ class _HomePageState extends State<HomePage> {
 
       // calling once at app launch
       _getAppInfo();
-      // calling _getAppInfo every 5 seconds
-      Timer.periodic(Duration(seconds: 6), (timer) async {
+      // calling _getAppInfo every 15 seconds
+      Timer.periodic(Duration(seconds: 15), (timer) async {
         await _getAppInfo();
       });
     } catch (e) {
@@ -133,6 +136,7 @@ class _HomePageState extends State<HomePage> {
   // downloadButton function checks for storage permission and then downloads
   Future<void> downloadButton() async {
     await _checkAndRequestStoragePermission(); // prompt storage permission
+    
     await downloadFile(); // start downloading
   }
 
@@ -152,7 +156,8 @@ class _HomePageState extends State<HomePage> {
       return;
     }
 
-    final dio = Dio(); // starting dio
+    // starting dio
+    final dio = Dio();
 
     // finds selected version or returns a blank Version object as a fallback
     final version = versions.firstWhere(
@@ -170,6 +175,19 @@ class _HomePageState extends State<HomePage> {
     }
 
     final filePath = '${directory.path}/inxta_v${selectedVersion!}.apk'; // save file as
+    
+    // checks and installs if selected version apk already exists in /Downloads
+    final file = File(filePath);
+    if (await file.exists()) {
+      setState(() {
+        fileExists = true;
+      });
+      _showSnackBar('Already downloaded, installing...');
+      await Future.delayed(Duration(milliseconds: 800));
+      await _openAndroidApk(filePath);
+      return;
+    }
+
     try {
       // download start
       setState(() {
@@ -197,9 +215,12 @@ class _HomePageState extends State<HomePage> {
       });
     }
 
-    // auto open downloaded apk file
+    // auto open the downloaded apk file
+    await Future.delayed(Duration(milliseconds: 800));
     await _openAndroidApk(filePath);
   }
+
+
 
 
 
@@ -223,8 +244,6 @@ class _HomePageState extends State<HomePage> {
         _openResult = "type=${result.type}  message=${result.message}";
       });
     }
-
-    //OpenFilex.open(filePath);
   }
 
 
@@ -254,12 +273,35 @@ class _HomePageState extends State<HomePage> {
 // ===========================================================
   // snackbar component for displaying messages below
   void _showSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message, style: TextStyle(fontFamily: 'InstagramSans', fontSize: 16),)));
+    // prevent multiple snackbars being called when spammed
+    if (_isSnackBarVisible) return;
+
+    // snackbar visible while _showCustomSnackBar is called
+    _isSnackBarVisible = true;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.fixed,
+        duration: Duration(seconds: 2),
+        content: Center(
+          child: Text(
+          message, 
+          style: TextStyle(
+            fontFamily: 'InstagramSans',
+            fontSize: 16
+          )
+        ),
+        )
+      )
+    ).closed.then((_) {
+      // resetting the flag after the snackbar disappears
+      _isSnackBarVisible = false;
+    });
   }
 
 
 
-
+  
 
 
 
@@ -314,18 +356,13 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _uninstallApp() async {
-    try {
-      bool? uninstallSuccessful = await InstalledApps.uninstallApp(packageName);
+    bool? uninstalled = await InstalledApps.uninstallApp(packageName);
 
-      if (uninstallSuccessful == true) {
-        setState(() {
-          versionName = 'Not Installed';
-        });
-      } else {
-        //print('object');
-      }
-    } catch (e) {
-      //print('object');
+    // setting version text to not installed
+    if (uninstalled == true) {
+      setState(() {
+        versionName = 'Not Installed';
+      });
     }
   }
 
@@ -344,7 +381,7 @@ class _HomePageState extends State<HomePage> {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        debugPrint('Fetched data: $data');
+        //debugPrint('Fetched data: $data');
 
         if (data.isNotEmpty) {
           // map json data to Version objects
@@ -363,8 +400,8 @@ class _HomePageState extends State<HomePage> {
           // convert the installed version to comparable format
           final installed = convertToComparableFormat(installedVersion);
 
-          debugPrint('Converted installed version: $installed');
-          debugPrint('Latest Instagram Base version: $latestBaseVersion');
+          //debugPrint('Converted installed version: $installed');
+          //debugPrint('Latest Instagram Base version: $latestBaseVersion');
 
           // compare installed version with latest base version and update status
           setState(() {
@@ -373,19 +410,19 @@ class _HomePageState extends State<HomePage> {
                 : 'Your app is up-to-date!';
           });
         } else {
-          debugPrint('Error: Empty or incorrect data');
+          //debugPrint('Error: Empty or incorrect data');
           setState(() {
             _updateStatus = 'Error fetching version data.';
           });
         }
       } else {
-        debugPrint('HTTP error: ${response.statusCode}');
+        //debugPrint('HTTP error: ${response.statusCode}');
         setState(() {
           _updateStatus = 'Error fetching version data.';
         });
       }
     } catch (e) {
-      debugPrint('Error checking version: $e');
+      //debugPrint('Error checking version: $e');
       setState(() {
         _updateStatus = 'Error checking for updates.';
       });
@@ -411,20 +448,22 @@ class _HomePageState extends State<HomePage> {
 
 
 
-
+  // main UI
   @override
   Widget build(BuildContext context) {
+    // getting user's device screen height
+    double screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       body: Center(
         child: loading
-            ? const CircularProgressIndicator( // loading at start
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
-              )
+            ? const CircularProgressIndicator()
             : Padding( // padding entire screen
                 padding: const EdgeInsets.symmetric(horizontal: 42),
                 child: Column(
                   children: [
-                    const SizedBox(height: 130), // top space
+                    // sets top space to 14% of the screen's total height
+                    SizedBox(height: screenHeight * 0.14), // top space
 
                     const Image( // logo
                       image: AssetImage('assets/logo512.png'),
@@ -438,7 +477,7 @@ class _HomePageState extends State<HomePage> {
                         fontFamily: 'InstagramSansHeadline',
                         fontSize: 36,
                         fontWeight: FontWeight.w700,
-                        color: Colors.black,
+                        color: Color.fromARGB(255, 38, 38, 38),
                       ),
                     ),
 
@@ -466,8 +505,6 @@ class _HomePageState extends State<HomePage> {
                       ),
 
                     const SizedBox(height: 24), // spacer
-                    // Text('$selectedVersion'),
-                    // Text(_openResult),
 
                     SizedBox(
                       width: double.infinity,
@@ -521,7 +558,7 @@ class _HomePageState extends State<HomePage> {
                             onPressed: _openFileManager,
                             icon: Icon(
                               Icons.drive_file_move_outline,
-                              color: Color.fromARGB(255, 37, 37, 37),
+                              color: Color.fromARGB(255, 38, 38, 38),
                             ),
                             tooltip: 'Open downloads',
                             iconSize: 30,
@@ -537,7 +574,7 @@ class _HomePageState extends State<HomePage> {
                             child: ElevatedButton( // download button
                               onPressed: isDownloading ? null : downloadButton, // downloadButton function checks for storage permission and then downloads if granted
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.black,
+                                backgroundColor: Color.fromARGB(255, 38, 38, 38),
                                 shape: RoundedRectangleBorder( // rounding the edges
                                   borderRadius: BorderRadius.circular(4),
                                 ),
@@ -549,7 +586,7 @@ class _HomePageState extends State<HomePage> {
                                   fontWeight: FontWeight.w500,
                                   fontSize: 20,
                                   color:
-                                    isDownloading ? Colors.black : Colors.white,
+                                    isDownloading ? Color.fromARGB(255, 38, 38, 38) : Colors.white,
                                 ),
                               ),
                             ),

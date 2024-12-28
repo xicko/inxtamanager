@@ -17,10 +17,22 @@ class MainApp extends StatelessWidget {
       home: const BaseScreen(),
       theme: ThemeData(
         scaffoldBackgroundColor: const Color(0xFFF5F5F5), // grey 100
-        snackBarTheme: SnackBarThemeData(
-          backgroundColor: Colors.black,
-          contentTextStyle: const TextStyle(color: Colors.white), // white text
+        fontFamily: 'InstagramSans',
+
+        progressIndicatorTheme: ProgressIndicatorThemeData(
+          color: Color.fromARGB(255, 38, 38, 38),
         ),
+
+        snackBarTheme: SnackBarThemeData(
+          backgroundColor: Colors.white,
+          contentTextStyle: TextStyle(color: Color.fromARGB(255, 38, 38, 38)),
+        ),
+
+        navigationBarTheme: NavigationBarThemeData(
+          indicatorColor: Color.fromARGB(255, 38, 38, 38),
+          backgroundColor: Color.fromARGB(255, 255, 255, 255),
+        ),
+        
         dropdownMenuTheme: DropdownMenuThemeData(
           menuStyle: MenuStyle(
             backgroundColor: WidgetStateProperty.all(Colors.white),
