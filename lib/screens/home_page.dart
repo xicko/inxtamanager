@@ -2,6 +2,9 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+// import 'package:provider/provider.dart';
+// import '../theme/theme.dart';
+// import '../theme/theme_provider.dart';
 // import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
@@ -19,6 +22,7 @@ import '../models/version.dart';
 import '../widgets/download_progress.dart';
 // import '../widgets/version_dropdown.dart';
 import '../services/version_service.dart';
+// import '../services/downloadfile_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -39,7 +43,7 @@ class _HomePageState extends State<HomePage> {
   bool fileExists = false;
   bool loading = true;
   bool isAppInstalled = false;
-   bool _isSnackBarVisible = false; // flag to track snackbar is currently active
+  bool _isSnackBarVisible = false; // flag to track if snackbar is currently active
   String _updateStatus = "Checking for updates...";
   
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -455,193 +459,211 @@ class _HomePageState extends State<HomePage> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      body: Center(
-        child: loading
-            ? const CircularProgressIndicator()
-            : Padding( // padding entire screen
-                padding: const EdgeInsets.symmetric(horizontal: 42),
-                child: Column(
-                  children: [
-                    // sets top space to 14% of the screen's total height
-                    SizedBox(height: screenHeight * 0.14), // top space
+      // stack incase need to overlay elements over main UI
+      body: Stack(
+        children: [
+          // theme toggle button
+          //Positioned(
+          //top: 16,
+          //right: 16,
+          //child: SizedBox(
+          //  height: 55,
+          //  child: IconButton(
+          //    onPressed: () {Provider.of<ThemeProvider>(context, listen: false).toggleTheme();},
+          //    icon: Icon(
+          //      Icons.light_mode_rounded,
+          //      color: Theme.of(context).colorScheme.onPrimary,
+          //    ),
+          //    tooltip: 'Open downloads',
+          //    iconSize: 30,
+          //    ),
+          //  ),
+          //),
 
-                    const Image( // logo
-                      image: AssetImage('assets/logo512.png'),
-                      width: 100,
-                      height: 100,
-                    ),
+          // main UI
+          Center(
+            child: loading
+                ? const CircularProgressIndicator()
+                : Padding( // padding entire screen
+                    padding: const EdgeInsets.symmetric(horizontal: 42),
+                    child: Column(
+                      children: [
+                        // sets top space to 14% of the screen's total height
+                        SizedBox(height: screenHeight * 0.14), // top space
 
-                    const Text( // title
-                      'Inxta Manager',
-                      style: TextStyle(
-                        fontFamily: 'InstagramSansHeadline',
-                        fontSize: 36,
-                        fontWeight: FontWeight.w700,
-                        color: Color.fromARGB(255, 38, 38, 38),
-                      ),
-                    ),
-
-                    const SizedBox(height: 14), // spacer
-
-                    // installed version text
-                    Text(
-                      'Installed version: $versionName',
-                      style: TextStyle(
-                        fontFamily: 'InstagramSans',
-                        fontSize: 16
-                      ),
-                    ),
-
-                    const SizedBox(height: 8), // spacer
-
-                    if (isAppInstalled)
-                      Text(
-                        _updateStatus,
-                        style: TextStyle(
-                          fontFamily: 'InstagramSans',
-                          fontSize: 16,
-                          color: const Color.fromARGB(255, 17, 69, 125),
+                        const Image( // logo
+                          image: AssetImage('assets/logo512.png'),
+                          width: 100,
+                          height: 100,
                         ),
-                      ),
 
-                    const SizedBox(height: 24), // spacer
+                        Text( // title
+                          'Inxta Manager',
+                          style: TextStyle(
+                            fontFamily: 'InstagramSansHeadline',
+                            fontSize: 36,
+                            fontWeight: FontWeight.w700,
+                            color: Theme.of(context).colorScheme.onPrimary,
+                          ),
+                        ),
 
-                    SizedBox(
-                      width: double.infinity,
-                      // used layoutbuilder to dynamically find the width of the parent and set the width for its child
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          return DropdownMenu<String>(
-                            initialSelection: selectedVersion,
-                            width: constraints.maxWidth, // width
-                            onSelected: (String? newValue) {
-                              setState(() {
-                                selectedVersion = newValue;
-                              });
+                        const SizedBox(height: 14), // spacer
+
+                        // installed version text
+                        Text(
+                          'Installed version: $versionName',
+                          style: TextStyle(
+                            fontFamily: 'InstagramSans',
+                            fontSize: 16
+                          ),
+                        ),
+
+                        const SizedBox(height: 8), // spacer
+
+                        if (isAppInstalled)
+                          Text(
+                            _updateStatus,
+                            style: TextStyle(
+                              fontFamily: 'InstagramSans',
+                              fontSize: 16,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+
+                        const SizedBox(height: 24), // spacer
+
+                        SizedBox(
+                          width: double.infinity,
+                          // used layoutbuilder to dynamically find the width of the parent and set the width for its child
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              return DropdownMenu<String>(
+                                initialSelection: selectedVersion,
+                                width: constraints.maxWidth, // width
+                                onSelected: (String? newValue) {
+                                  setState(() {
+                                    selectedVersion = newValue;
+                                  });
+                                },
+                                label: const Text(
+                                  'Select Version',
+                                  style: TextStyle(
+                                    fontFamily: 'InstagramSans',
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                                dropdownMenuEntries: versions
+                                    .map(
+                                      (version) => DropdownMenuEntry<String>(
+                                        value: version.version,
+                                        label: version.label,
+                                        labelWidget: Text(
+                                          version.label,
+                                          style: const TextStyle(
+                                            fontFamily: 'InstagramSans',
+                                            fontSize: 20,
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                              );
                             },
-                            label: const Text(
-                              'Select Version',
-                              style: TextStyle(
-                                fontFamily: 'InstagramSans',
-                                fontWeight: FontWeight.w500,
-                                fontSize: 20,
+                          ),
+                        ),
+
+                        const SizedBox(height: 20), // spacer
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(
+                              height: 55,
+                              child: IconButton(
+                                onPressed: _openFileManager,
+                                icon: Icon(
+                                  Icons.drive_file_move_outline,
+                                  color: Theme.of(context).colorScheme.onPrimary,
+                                ),
+                                tooltip: 'Open downloads',
+                                iconSize: 30,
                               ),
                             ),
-                            dropdownMenuEntries: versions
-                                .map(
-                                  (version) => DropdownMenuEntry<String>(
-                                    value: version.version,
-                                    label: version.label,
-                                    labelWidget: Text(
-                                      version.label,
-                                      style: const TextStyle(
-                                        fontFamily: 'InstagramSans',
-                                        fontSize: 20,
-                                      ),
+
+                            SizedBox(width: 10), // spacer
+
+                            // using Expanded to stretch to fit its parent element
+                            Expanded(
+                              child: SizedBox(
+                                height: 55,
+                                child: ElevatedButton( // download button
+                                  onPressed: isDownloading ? null : downloadButton, // downloadButton function checks for storage permission and then downloads if granted
+                                  child: Text(
+                                    'Download APK',
+                                    style: TextStyle(
+                                      fontFamily: 'InstagramSans',
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 20,
+                                      color:
+                                        isDownloading ? Theme.of(context).elevatedButtonTheme.style?.foregroundColor?.resolve({WidgetState.disabled}) : Theme.of(context).elevatedButtonTheme.style?.backgroundColor?.resolve({WidgetState.disabled})
                                     ),
                                   ),
-                                )
-                                .toList(),
-                          );
-                        },
-                      ),
-                    ),
-
-                    const SizedBox(height: 20), // spacer
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(
-                          height: 55,
-                          child: IconButton(
-                            onPressed: _openFileManager,
-                            icon: Icon(
-                              Icons.drive_file_move_outline,
-                              color: Color.fromARGB(255, 38, 38, 38),
-                            ),
-                            tooltip: 'Open downloads',
-                            iconSize: 30,
-                          ),
-                        ),
-
-                        SizedBox(width: 10), // spacer
-
-                        // using Expanded to stretch to fit its parent element
-                        Expanded(
-                          child: SizedBox(
-                            height: 55,
-                            child: ElevatedButton( // download button
-                              onPressed: isDownloading ? null : downloadButton, // downloadButton function checks for storage permission and then downloads if granted
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Color.fromARGB(255, 38, 38, 38),
-                                shape: RoundedRectangleBorder( // rounding the edges
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                              ),
-                              child: Text(
-                                'Download APK',
-                                style: TextStyle(
-                                  fontFamily: 'InstagramSans',
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 20,
-                                  color:
-                                    isDownloading ? Color.fromARGB(255, 38, 38, 38) : Colors.white,
                                 ),
                               ),
                             ),
-                          ),
+
+                            SizedBox(width: 10), // spacer
+
+                            SizedBox(
+                              height: 55,
+                              child: IconButton(
+                                onPressed: _uninstallApp,
+                                icon: Icon(
+                                  Icons.delete_outline_rounded,
+                                  color: Theme.of(context).colorScheme.error,
+                                ),
+                                tooltip: 'Uninstall from device',
+                                iconSize: 30,
+                              ),
+                            ),
+                          ],
                         ),
 
-                        SizedBox(width: 10), // spacer
+                        // showing progressbar when downloading
+                        if (isDownloading)
+                        DownloadProgress(progress: downloadProgress),
+                        
+                        const SizedBox(height: 15), // spacer
 
-                        SizedBox(
-                          height: 55,
-                          child: IconButton(
-                            onPressed: _uninstallApp,
-                            icon: Icon(
-                              Icons.delete_outline_rounded,
-                              color: Color.fromARGB(255, 193, 5, 17),
+                        // aligning to left
+                        Align( 
+                          alignment: Alignment.centerLeft,
+                          child: Text( // changelog text
+                            versions
+                                .firstWhere((version) =>
+                                    version.version == selectedVersion,
+                                    orElse: () => Version( // if null these empty values are used
+                                      label: '',
+                                      version: '', 
+                                      instagramBase: '',
+                                      changelog: '', 
+                                      downloadLink: '', 
+                                      releaseDate: ''))
+                                .changelog,
+                            style: const TextStyle(
+                              fontFamily: 'InstagramSans',
+                              fontSize: 18,
+                              fontWeight: FontWeight.normal,
                             ),
-                            tooltip: 'Uninstall from device',
-                            iconSize: 30,
                           ),
                         ),
                       ],
                     ),
-
-                    // showing progressbar when downloading
-                    if (isDownloading)
-                    DownloadProgress(progress: downloadProgress),
-                    
-                    const SizedBox(height: 15), // spacer
-
-                    // aligning to left
-                    Align( 
-                      alignment: Alignment.centerLeft,
-                      child: Text( // changelog text
-                        versions
-                            .firstWhere((version) =>
-                                version.version == selectedVersion,
-                                orElse: () => Version( // if null these empty values are used
-                                  label: '',
-                                  version: '', 
-                                  instagramBase: '',
-                                  changelog: '', 
-                                  downloadLink: '', 
-                                  releaseDate: ''))
-                            .changelog,
-                        style: const TextStyle(
-                          fontFamily: 'InstagramSans',
-                          fontSize: 18,
-                          fontWeight: FontWeight.normal,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-      ),
+                  ),
+          ),
+        ],
+      )
     );
   }
 }

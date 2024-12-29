@@ -1,11 +1,22 @@
 import 'package:flutter/material.dart';
+// import 'package:provider/provider.dart';
 import 'base_screen.dart';
 import 'package:get/get.dart';
 import 'package:inxtamanager/base_controller.dart';
+import 'theme/theme.dart';
+// import 'theme/theme_provider.dart';
 
 void main() {
   Get.put<BaseController>(BaseController());
-  runApp(const MainApp());
+  runApp(
+    const MainApp(),
+
+    // use for theme toggle button
+    //ChangeNotifierProvider(
+    //  create: (context) => ThemeProvider(),
+    //  child: const MainApp(),
+    //)
+  );
 }
 
 class MainApp extends StatelessWidget {
@@ -15,30 +26,10 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: const BaseScreen(),
-      theme: ThemeData(
-        scaffoldBackgroundColor: const Color(0xFFF5F5F5), // grey 100
-        fontFamily: 'InstagramSans',
+      theme: lightMode,
+      darkTheme: darkMode,
 
-        progressIndicatorTheme: ProgressIndicatorThemeData(
-          color: Color.fromARGB(255, 38, 38, 38),
-        ),
-
-        snackBarTheme: SnackBarThemeData(
-          backgroundColor: Colors.white,
-          contentTextStyle: TextStyle(color: Color.fromARGB(255, 38, 38, 38)),
-        ),
-
-        navigationBarTheme: NavigationBarThemeData(
-          indicatorColor: Color.fromARGB(255, 38, 38, 38),
-          backgroundColor: Color.fromARGB(255, 255, 255, 255),
-        ),
-        
-        dropdownMenuTheme: DropdownMenuThemeData(
-          menuStyle: MenuStyle(
-            backgroundColor: WidgetStateProperty.all(Colors.white),
-          ),
-        ),
-      ),
+      // theme: Provider.of<ThemeProvider>(context).themeData,
     );
   }
 }
