@@ -16,22 +16,15 @@ class BottomNavBar extends StatelessWidget {
           destinations: [
             NavigationDestination(
               icon: Icon(Icons.home_outlined),
-              selectedIcon: Icon(
-                Icons.home,
-                color: Theme.of(context).bottomNavigationBarTheme.selectedItemColor,
-              ),
+              selectedIcon: Icon(Icons.home),
               label: "Home",
             ),
+            
             NavigationDestination(
               icon: Icon(Icons.help_outline_rounded),
-              selectedIcon: Icon(
-                Icons.help_rounded,
-                color: Theme.of(context).bottomNavigationBarTheme.selectedItemColor,
-              ),
+              selectedIcon: Icon(Icons.help_rounded),
               label: 'Help',
             ),
-
-            // FILES SCREEN REMOVED
           ],
         ));
   }

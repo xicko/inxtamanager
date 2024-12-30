@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+// import 'package:webview_flutter/webview_flutter.dart';
 
 class HelpPage extends StatefulWidget {
   const HelpPage({super.key});
 
   @override
-  _HelpPageState createState() => _HelpPageState();
+  HelpPageState createState() => HelpPageState();
 }
 
-class _HelpPageState extends State<HelpPage> with AutomaticKeepAliveClientMixin {
+class HelpPageState extends State<HelpPage> with AutomaticKeepAliveClientMixin {
   //final _controller = WebViewController()
   //..setJavaScriptMode(JavaScriptMode.unrestricted)
   //..loadRequest(Uri.parse('https://inxta.dashnyam.com'));
@@ -28,6 +28,7 @@ class _HelpPageState extends State<HelpPage> with AutomaticKeepAliveClientMixin 
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(0),

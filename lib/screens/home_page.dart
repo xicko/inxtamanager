@@ -18,11 +18,12 @@ import 'package:open_filex/open_filex.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:installed_apps/installed_apps.dart';
 import 'package:open_file_manager/open_file_manager.dart';
-import '../models/version.dart';
-import '../widgets/download_progress.dart';
-// import '../widgets/version_dropdown.dart';
-import '../services/version_service.dart';
-// import '../services/downloadfile_service.dart';
+import 'package:inxtamanager/colors.dart'; // theme specific colors
+import 'package:inxtamanager/models/version.dart';
+import 'package:inxtamanager/widgets/download_progress.dart';
+// import 'package:inxtamanager/widgets/version_dropdown.dart';
+import 'package:inxtamanager/services/version_service.dart';
+// import 'package:inxtamanager/services/downloadfile_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -503,7 +504,7 @@ class _HomePageState extends State<HomePage> {
                             fontFamily: 'InstagramSansHeadline',
                             fontSize: 36,
                             fontWeight: FontWeight.w700,
-                            color: Theme.of(context).colorScheme.onPrimary,
+                            color: AppColors.titleTextColor(Theme.of(context).brightness),
                           ),
                         ),
 
@@ -526,7 +527,7 @@ class _HomePageState extends State<HomePage> {
                             style: TextStyle(
                               fontFamily: 'InstagramSans',
                               fontSize: 16,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: AppColors.isInstalledTextColor(Theme.of(context).brightness),
                             ),
                           ),
 
@@ -584,7 +585,7 @@ class _HomePageState extends State<HomePage> {
                                 onPressed: _openFileManager,
                                 icon: Icon(
                                   Icons.drive_file_move_outline,
-                                  color: Theme.of(context).colorScheme.onPrimary,
+                                  color: AppColors.filesIconColor(Theme.of(context).brightness),
                                 ),
                                 tooltip: 'Open downloads',
                                 iconSize: 30,
@@ -606,7 +607,9 @@ class _HomePageState extends State<HomePage> {
                                       fontWeight: FontWeight.w500,
                                       fontSize: 20,
                                       color:
-                                        isDownloading ? Theme.of(context).elevatedButtonTheme.style?.foregroundColor?.resolve({WidgetState.disabled}) : Theme.of(context).elevatedButtonTheme.style?.backgroundColor?.resolve({WidgetState.disabled})
+                                        isDownloading 
+                                        ? AppColors.downloadButtonBackgroundColor(Theme.of(context).brightness) 
+                                        : AppColors.downloadButtonForegroundColor(Theme.of(context).brightness)
                                     ),
                                   ),
                                 ),
@@ -621,7 +624,7 @@ class _HomePageState extends State<HomePage> {
                                 onPressed: _uninstallApp,
                                 icon: Icon(
                                   Icons.delete_outline_rounded,
-                                  color: Theme.of(context).colorScheme.error,
+                                  color: AppColors.deleteIconColor(Theme.of(context).brightness),
                                 ),
                                 tooltip: 'Uninstall from device',
                                 iconSize: 30,

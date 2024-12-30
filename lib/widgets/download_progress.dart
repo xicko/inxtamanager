@@ -16,7 +16,6 @@ class DownloadProgress extends StatelessWidget {
         const SizedBox(height: 20),
         LinearProgressIndicator(
           value: progress,
-          color: Theme.of(context).colorScheme.onSecondary,
           backgroundColor: Theme.of(context).progressIndicatorTheme.linearTrackColor,
           minHeight: 28,
           borderRadius: BorderRadius.all(Radius.circular(4)),

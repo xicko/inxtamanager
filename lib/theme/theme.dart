@@ -1,3 +1,5 @@
+// element specific colors are in /lib/colors.dart
+
 import 'package:flutter/material.dart';
 
 // ==================================================================================================
@@ -5,22 +7,22 @@ ThemeData lightMode = ThemeData(
   fontFamily: 'InstagramSans',
   scaffoldBackgroundColor: Colors.grey[100], // Scaffold color
   colorScheme: ColorScheme(
-    primary: Color(0xFF124870), // for update text
-    secondary: Colors.white,
-    surface: Colors.white,
-    error: Color.fromARGB(255, 193, 5, 17), // for delete button
-    onPrimary: Color.fromARGB(255, 38, 38, 38), // gray on white
-    onSecondary: Color.fromARGB(255, 38, 38, 38), 
-    onSurface: Color.fromARGB(255, 38, 38, 38), 
-    onError: Color.fromARGB(255, 38, 38, 38), 
-    brightness: Brightness.light,
+    primary: Color(0xFF124870), // For primary actions like update text
+    secondary: Color(0xFFB3B3B3), // A neutral gray for secondary elements
+    surface: Colors.white, // Background surfaces (cards, dialogs)
+    error: Color(0xFFC10511), // Error-related visuals (delete buttons)
+    onPrimary: Colors.white, // Text/icons on primary color (white on blue)
+    onSecondary: Color(0xFF383838), // Text/icons on secondary color (dark gray)
+    onSurface: Color(0xFF383838), // Text/icons on surface (dark gray on white)
+    onError: Colors.white, // Text/icons on error (white on red)
+    brightness: Brightness.light, // Light theme brightness
   ),
 
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: Color.fromARGB(255, 38, 38, 38),
       foregroundColor: Colors.white,
-      shape: RoundedRectangleBorder( // rounding the edges
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(4),
       ),
     ),
@@ -43,13 +45,19 @@ ThemeData lightMode = ThemeData(
   ),
 
   navigationBarTheme: NavigationBarThemeData(
-    indicatorColor: Color.fromARGB(255, 38, 38, 38),
+    indicatorColor: Colors.grey[900],
     backgroundColor: Colors.white,
-  ),
-
-  bottomNavigationBarTheme: BottomNavigationBarThemeData(
-    selectedItemColor: Colors.white,
-    unselectedItemColor: Color.fromARGB(255, 38, 38, 38),
+    labelTextStyle: WidgetStateProperty.all(
+      TextStyle(color: Colors.grey[900]),
+    ),
+    iconTheme: WidgetStateProperty.resolveWith<IconThemeData>(
+      (states) {
+        if (states.contains(WidgetState.selected)) {
+          return IconThemeData(color: Colors.white); // Color for selected icons
+        }
+        return IconThemeData(color: Colors.grey[900]); // Color for unselected icons
+      },
+    ),
   ),
 );
 
@@ -60,22 +68,22 @@ ThemeData darkMode = ThemeData(
   fontFamily: 'InstagramSans',
   scaffoldBackgroundColor: const Color.fromARGB(255, 20, 20, 20), // Scaffold color - darker than gray[100]
   colorScheme: ColorScheme(
-    primary: Color.fromARGB(255, 86, 178, 248), // for update text
-    secondary: Color.fromARGB(255, 38, 38, 38),
-    surface: Color.fromARGB(255, 38, 38, 38),
-    error: Color.fromARGB(255, 245, 63, 75), // for delete button
-    onPrimary: Colors.white, // white on gray
-    onSecondary: Colors.white,
-    onSurface: Colors.white,
-    onError: Colors.white,
-    brightness: Brightness.dark,
+    primary: Color(0xFF56B2F8), // For primary actions like update text
+    secondary: Color(0xFF606060), // A neutral gray for secondary elements
+    surface: Color(0xFF1E1E1E), // Background surfaces (cards, dialogs)
+    error: Color(0xFFF53F4B), // Error-related visuals (delete buttons)
+    onPrimary: Colors.black, // Text/icons on primary color (black on light blue)
+    onSecondary: Colors.white, // Text/icons on secondary color (white on gray)
+    onSurface: Colors.white, // Text/icons on surface (white on dark gray)
+    onError: Colors.white, // Text/icons on error (white on red)
+    brightness: Brightness.dark, // Dark theme brightness
   ),
 
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: Colors.white,
       foregroundColor: Color.fromARGB(255, 38, 38, 38),
-      shape: RoundedRectangleBorder( // rounding the edges
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(4),
       ),
     ),
@@ -100,10 +108,16 @@ ThemeData darkMode = ThemeData(
   navigationBarTheme: NavigationBarThemeData(
     indicatorColor: Colors.white,
     backgroundColor: Colors.grey[900],
-  ),
-
-  bottomNavigationBarTheme: BottomNavigationBarThemeData(
-    selectedItemColor: Colors.grey[900],
-    unselectedItemColor: Colors.white,
+    labelTextStyle: WidgetStateProperty.all(
+      TextStyle(color: Colors.white),
+    ),
+    iconTheme: WidgetStateProperty.resolveWith<IconThemeData>(
+      (states) {
+        if (states.contains(WidgetState.selected)) {
+          return IconThemeData(color: Colors.grey[900]); // Color for selected icons
+        }
+        return IconThemeData(color: Colors.white); // Color for unselected icons
+      },
+    ),
   ),
 );
