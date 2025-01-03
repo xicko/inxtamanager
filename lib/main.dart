@@ -6,17 +6,10 @@ import 'package:inxtamanager/base_controller.dart';
 import 'theme/theme.dart';
 // import 'theme/theme_provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   Get.put<BaseController>(BaseController());
-  runApp(
-    const MainApp(),
-
-    // use for theme toggle button
-    //ChangeNotifierProvider(
-    //  create: (context) => ThemeProvider(),
-    //  child: const MainApp(),
-    //)
-  );
+  runApp(const MainApp());
 }
 
 class MainApp extends StatelessWidget {

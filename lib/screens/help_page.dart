@@ -16,13 +16,13 @@ class HelpPageState extends State<HelpPage> with AutomaticKeepAliveClientMixin {
   @override
   void initState() {
     super.initState();
-  //  WidgetsFlutterBinding.ensureInitialized();
-  //  WebViewPlatform.instance;
+    //  WidgetsFlutterBinding.ensureInitialized();
+    //  WebViewPlatform.instance;
   }
 
   @override
   void dispose() {
-  //  _controller.clearCache();
+    //  _controller.clearCache();
     super.dispose();
   }
 
@@ -35,9 +35,7 @@ class HelpPageState extends State<HelpPage> with AutomaticKeepAliveClientMixin {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Expanded(
-              child: Placeholder()
-              ),
+            Expanded(child: Placeholder()),
           ],
         ),
       ),

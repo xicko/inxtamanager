@@ -19,7 +19,6 @@ class BottomNavBar extends StatelessWidget {
               selectedIcon: Icon(Icons.home),
               label: "Home",
             ),
-            
             NavigationDestination(
               icon: Icon(Icons.help_outline_rounded),
               selectedIcon: Icon(Icons.help_rounded),

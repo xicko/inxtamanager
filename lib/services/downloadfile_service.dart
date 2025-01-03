@@ -1,100 +1,118 @@
-// broken
-
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:inxtamanager/base_controller.dart';
+import 'package:inxtamanager/widgets/simple_snackbar.dart';
+import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:audioplayers/audioplayers.dart';
-import '../models/version.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:inxtamanager/models/version.dart';
 
 class DownloadfileService {
-  Future<void> downloadFile({
-    required AudioPlayer audioPlayer,
-    required String? selectedVersion,
-    required List<Version> versions,
-    required Function(String) showSnackBar,
-    required Function(double) downloadProgress, // Pass a callback to update progress
-    required bool isDownloading,
-    required Function(String) openAndroidApk,
-  }) async {
-    // Play sound
-    await audioPlayer.play(AssetSource('sounds/click.wav'));
-
-    // Show message when the selected version is null
-    if (selectedVersion == null) {
-      showSnackBar('Please select a version to download.');
-      return;
-    }
-
-    // Initialize Dio
-    final dio = Dio();
-
-    // Find selected version or return a blank Version object as fallback
-    final version = versions.firstWhere(
-      (v) => v.version == selectedVersion,
-      orElse: () => Version(
-        label: '',
-        version: '',
-        instagramBase: '',
-        downloadLink: '',
-        changelog: '',
-        releaseDate: '',
-      ),
-    );
-
-    final directory = await getDownloadDirectory();
-
-    // Return message if getting the download directory was unsuccessful/null
-    if (directory == null) {
-      showSnackBar('Unable to access downloads directory.');
-      return;
-    }
-
-    final filePath = '${directory.path}/inxta_v${selectedVersion!}.apk'; // Save file as
-    
-    // Check if the selected version APK already exists in /Downloads
-    final file = File(filePath);
-    if (await file.exists()) {
-      showSnackBar('Already downloaded, installing...');
-      await Future.delayed(Duration(milliseconds: 800));
-      await openAndroidApk(filePath);
-      return;
-    }
-
-    try {
-      // Start download
-      isDownloading = true;  // Update isDownloading to true
-      downloadProgress(0.0);  // Reset progress to 0
-
-      // Update download progress
-      await dio.download(version.downloadLink, filePath,
-          onReceiveProgress: (received, total) {
-        if (total != -1) {
-          final progress = received / total;
-          debugPrint(progress as String?);
-          downloadProgress(progress);  // Update download progress via the callback
-        }
-      });
-
-      // After completion
-      showSnackBar('Download complete: $filePath');
-    } catch (e) {
-      showSnackBar('Download failed: $e');
-    } finally {
-      isDownloading = false;  // Update isDownloading to false
-    }
-
-    // Auto open the downloaded APK file
-    await Future.delayed(Duration(milliseconds: 800));
-    await openAndroidApk(filePath);
-  }
-
-  Future<Directory?> getDownloadDirectory() async {
+  // Getting Download Director
+  static Future<Directory?> getDownloadDirectory() async {
+    // specifying download directory for platforms
     if (Platform.isAndroid) {
       return Directory('/storage/emulated/0/Download');
     } else if (Platform.isIOS) {
       return await getApplicationDocumentsDirectory();
     }
     return null;
+  }
+
+  // Open APK Method
+  static Future<void> openAndroidApk(String filePath) async {
+    if (await Permission.manageExternalStorage.request().isGranted) {
+      final result = await OpenFilex.open(filePath);
+
+      BaseController.to.openResult.value =
+          "type=${result.type}  message=${result.message}";
+    }
+    if (await Permission.storage.request().isGranted) {
+      final result = await OpenFilex.open(filePath);
+
+      BaseController.to.openResult.value =
+          "type=${result.type}  message=${result.message}";
+    }
+  }
+
+  // Main Download File Method
+  static Future<void> downloadFile(BuildContext context) async {
+    //snackbar
+    final snackbar = SimpleSnackbar(context);
+
+    // main download function
+    await BaseController.to.audioPlayer
+        .play(AssetSource('sounds/click.wav')); // play sound
+
+    // showing message when current selected version is null
+    if (BaseController.to.selectedVersion.value == null) {
+      snackbar.show('Please select a version to download.');
+      return;
+    }
+
+    // starting dio
+    final dio = Dio();
+
+    // finds selected version or returns a blank Version object as a fallback
+    final version = BaseController.to.versions.firstWhere(
+      (v) => v.version == BaseController.to.selectedVersion.value,
+      orElse: () => Version(
+          label: '',
+          version: '',
+          instagramBase: '',
+          downloadLink: '',
+          changelog: '',
+          releaseDate: ''),
+    );
+
+    final directory = await getDownloadDirectory();
+
+    // return message if getting download directory was unsuccessful/null
+    if (directory == null) {
+      snackbar.show('Unable to access downloads directory.');
+      return;
+    }
+
+    final filePath =
+        '${directory.path}/inxta_v${BaseController.to.selectedVersion.value!}.apk'; // save file as
+
+    // checks and installs if selected version apk already exists in /Downloads
+    final file = File(filePath);
+    if (await file.exists()) {
+      BaseController.to.fileExists.value = true;
+
+      snackbar.show('Already downloaded, installing...');
+      await Future.delayed(Duration(milliseconds: 800));
+      await openAndroidApk(filePath);
+      return;
+    }
+
+    try {
+      // download start
+
+      BaseController.to.isDownloading.value = true;
+      BaseController.to.downloadProgress.value = 0.0;
+
+      // updating downloadProgress based on received data and total size
+      await dio.download(version.downloadLink, filePath,
+          onReceiveProgress: (received, total) {
+        if (total != -1) {
+          BaseController.to.downloadProgress.value = received / total;
+        }
+      });
+
+      // after completion
+      snackbar.show('Download complete: $filePath');
+    } catch (e) {
+      snackbar.show('Download failed: $e');
+    } finally {
+      BaseController.to.isDownloading.value = false;
+    }
+
+    // auto open the downloaded apk file
+    await Future.delayed(Duration(milliseconds: 800));
+    await openAndroidApk(filePath);
   }
 }

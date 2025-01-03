@@ -8,14 +8,16 @@ class FileExplorerScreen extends StatefulWidget {
   _FileExplorerScreenState createState() => _FileExplorerScreenState();
 }
 
-class _FileExplorerScreenState extends State<FileExplorerScreen> with AutomaticKeepAliveClientMixin {
+class _FileExplorerScreenState extends State<FileExplorerScreen>
+    with AutomaticKeepAliveClientMixin {
   void _openFileManager() {
     openFileManager(
       androidConfig: AndroidConfig(
         folderType: FolderType.download, // Opens the Downloads folder
       ),
       iosConfig: IosConfig(
-        subFolderPath: 'Documents', // Open a subfolder in the app's document folder on iOS
+        subFolderPath:
+            'Documents', // Open a subfolder in the app's document folder on iOS
       ),
     );
   }
