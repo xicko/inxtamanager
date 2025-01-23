@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:inxtamanager/base_controller.dart';
+import 'package:inxtamanager/controllers/base_controller.dart';
 
 class VersionDropdown extends StatelessWidget {
   const VersionDropdown({super.key});
@@ -24,6 +24,9 @@ class VersionDropdown extends StatelessWidget {
                 fontWeight: FontWeight.w500,
                 fontSize: 20,
               ),
+            ),
+            textStyle: TextStyle(
+              fontSize: 20,
             ),
             dropdownMenuEntries: BaseController.to.versions
                 .map(

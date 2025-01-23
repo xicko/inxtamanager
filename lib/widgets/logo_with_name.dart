@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:inxtamanager/colors.dart';
+import 'package:inxtamanager/theme/colors.dart';
 
 class LogoWithName extends StatelessWidget {
   const LogoWithName({super.key});

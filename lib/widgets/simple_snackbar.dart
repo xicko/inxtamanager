@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:inxtamanager/base_controller.dart';
+import 'package:inxtamanager/controllers/base_controller.dart';
 
 class SimpleSnackbar {
   static final SimpleSnackbar _instance = SimpleSnackbar._internal();
@@ -32,10 +32,12 @@ class SimpleSnackbar {
                         TextStyle(fontFamily: 'InstagramSans', fontSize: 16)),
               )))
           .closed
-          .then((_) {
-        // resetting the flag after the snackbar disappears
-        BaseController.to.isSnackBarVisible.value = false;
-      });
+          .then(
+        (_) {
+          // resetting the flag after the snackbar disappears
+          BaseController.to.isSnackBarVisible.value = false;
+        },
+      );
     }
   }
 }

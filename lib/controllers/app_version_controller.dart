@@ -1,40 +1,45 @@
 import 'dart:convert';
 
+import 'package:get/get.dart';
 import 'package:installed_apps/app_info.dart';
 import 'package:installed_apps/installed_apps.dart';
-import 'package:inxtamanager/base_controller.dart';
-import 'package:inxtamanager/models/version.dart';
 import 'package:http/http.dart' as http;
+import 'package:inxtamanager/models/version.dart';
 
-class AppVersionInfoService {
-  // fetch installed app info
-  static Future<void> getAppInfo() async {
+class AppVersionController extends GetxController {
+  static AppVersionController get to => Get.find();
+
+  RxString appName = ''.obs;
+  RxString versionName = 'Loading'.obs;
+  RxString packageName = 'com.dashnyam.inxta'.obs;
+  RxBool isAppInstalled = false.obs;
+  RxString updateStatus = 'Checking for updates...'.obs;
+
+  Future<void> getAppInfo() async {
     try {
-      AppInfo? appInfo =
-          await InstalledApps.getAppInfo(BaseController.to.packageName.value);
+      AppInfo? appInfo = await InstalledApps.getAppInfo(packageName.value);
 
       if (appInfo != null) {
-        BaseController.to.appName.value = appInfo.name;
-        BaseController.to.versionName.value = appInfo.versionName;
-        BaseController.to.isAppInstalled.value = true;
+        appName.value = appInfo.name;
+        versionName.value = appInfo.versionName;
+        isAppInstalled.value = true;
 
-        checkVersion(BaseController.to.versionName.value);
+        checkVersion(versionName.value);
       } else {
-        BaseController.to.appName.value = 'Not Installed';
-        BaseController.to.versionName.value = 'Not Installed';
-        BaseController.to.updateStatus.value = 'App is not installed.';
-        BaseController.to.isAppInstalled.value = false;
+        appName.value = 'Not Installed';
+        versionName.value = 'Not Installed';
+        updateStatus.value = 'App is not installed.';
+        isAppInstalled.value = false;
       }
     } catch (e) {
-      BaseController.to.appName.value = 'Error';
-      BaseController.to.versionName.value = 'Error';
-      BaseController.to.updateStatus.value = 'Error fetching app info.';
-      BaseController.to.isAppInstalled.value = false;
+      appName.value = 'Error';
+      versionName.value = 'Error';
+      updateStatus.value = 'Error fetching app info.';
+      isAppInstalled.value = false;
     }
   }
 
-// ===========================================================
-  static Future<void> checkVersion(String installedVersion) async {
+  Future<void> checkVersion(String installedVersion) async {
     const String jsonUrl = 'https://dl.dashnyam.com/inxtalog.json';
 
     try {
@@ -67,7 +72,7 @@ class AppVersionInfoService {
 
           // compare installed version with latest base version and update status
 
-          BaseController.to.updateStatus.value = compareVersionLists(
+          updateStatus.value = compareVersionLists(
                       installed, latestBaseVersion) <
                   0
               ? 'Update available! ${latestBaseVersion.join('.')}' // Display latest version
@@ -75,22 +80,21 @@ class AppVersionInfoService {
         } else {
           //debugPrint('Error: Empty or incorrect data');
 
-          BaseController.to.updateStatus.value = 'Error fetching version data.';
+          updateStatus.value = 'Error fetching version data.';
         }
       } else {
         //debugPrint('HTTP error: ${response.statusCode}');
 
-        BaseController.to.updateStatus.value = 'Error fetching version data.';
+        updateStatus.value = 'Error fetching version data.';
       }
     } catch (e) {
       //debugPrint('Error checking version: $e');
 
-      BaseController.to.updateStatus.value = 'Error checking for updates.';
+      updateStatus.value = 'Error checking for updates.';
     }
   }
 
-  // for comparing two version lists
-  static int compareVersionLists(List<int> a, List<int> b) {
+  int compareVersionLists(List<int> a, List<int> b) {
     for (int i = 0; i < a.length && i < b.length; i++) {
       if (a[i] < b[i]) {
         return -1; // a is smaller than b

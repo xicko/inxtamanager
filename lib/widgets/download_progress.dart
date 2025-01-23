@@ -27,7 +27,7 @@ class DownloadProgress extends StatelessWidget {
         Text(
           '${(progress * 100).toStringAsFixed(1)}% downloaded',
           style: TextStyle(fontFamily: 'InstagramSans'),
-        )
+        ),
       ],
     );
   }

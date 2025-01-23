@@ -1,17 +1,25 @@
 import 'dart:io';
+
+import 'package:audioplayers/audioplayers.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:inxtamanager/base_controller.dart';
+import 'package:get/get.dart';
+import 'package:inxtamanager/controllers/base_controller.dart';
+import 'package:inxtamanager/models/version.dart';
 import 'package:inxtamanager/widgets/simple_snackbar.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:inxtamanager/models/version.dart';
 
-class DownloadfileService {
-  // Getting Download Director
-  static Future<Directory?> getDownloadDirectory() async {
+class DownloadController extends GetxController {
+  static DownloadController get to => Get.find();
+
+  RxDouble downloadProgress = 0.0.obs;
+  RxBool isDownloading = false.obs;
+  RxBool fileExists = false.obs;
+
+// Getting Download Directory
+  Future<Directory?> getDownloadDirectory() async {
     // specifying download directory for platforms
     if (Platform.isAndroid) {
       return Directory('/storage/emulated/0/Download');
@@ -22,7 +30,7 @@ class DownloadfileService {
   }
 
   // Open APK Method
-  static Future<void> openAndroidApk(String filePath) async {
+  Future<void> openAndroidApk(String filePath) async {
     if (await Permission.manageExternalStorage.request().isGranted) {
       final result = await OpenFilex.open(filePath);
 
@@ -38,7 +46,7 @@ class DownloadfileService {
   }
 
   // Main Download File Method
-  static Future<void> downloadFile(BuildContext context) async {
+  Future<void> downloadFile(BuildContext context) async {
     //snackbar
     final snackbar = SimpleSnackbar(context);
 
@@ -81,7 +89,7 @@ class DownloadfileService {
     // checks and installs if selected version apk already exists in /Downloads
     final file = File(filePath);
     if (await file.exists()) {
-      BaseController.to.fileExists.value = true;
+      fileExists.value = true;
 
       snackbar.show('Already downloaded, installing...');
       await Future.delayed(Duration(milliseconds: 800));
@@ -91,15 +99,14 @@ class DownloadfileService {
 
     try {
       // download start
-
-      BaseController.to.isDownloading.value = true;
-      BaseController.to.downloadProgress.value = 0.0;
+      isDownloading.value = true;
+      downloadProgress.value = 0.0;
 
       // updating downloadProgress based on received data and total size
       await dio.download(version.downloadLink, filePath,
           onReceiveProgress: (received, total) {
         if (total != -1) {
-          BaseController.to.downloadProgress.value = received / total;
+          downloadProgress.value = received / total;
         }
       });
 
@@ -108,7 +115,7 @@ class DownloadfileService {
     } catch (e) {
       snackbar.show('Download failed: $e');
     } finally {
-      BaseController.to.isDownloading.value = false;
+      isDownloading.value = false;
     }
 
     // auto open the downloaded apk file

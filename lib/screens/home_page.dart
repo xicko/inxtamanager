@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:inxtamanager/base_controller.dart';
-import 'package:inxtamanager/services/appversioninfo_service.dart';
+import 'package:inxtamanager/controllers/app_version_controller.dart';
+import 'package:inxtamanager/controllers/base_controller.dart';
+import 'package:inxtamanager/controllers/download_controller.dart';
 import 'package:inxtamanager/widgets/appversioninfo_text.dart';
 import 'package:inxtamanager/widgets/changelogtext.dart';
-import 'package:inxtamanager/widgets/download_uninstall_files_buttons.dart';
+import 'package:inxtamanager/widgets/home_buttons.dart';
 import 'package:inxtamanager/widgets/logo_with_name.dart';
 import 'package:inxtamanager/widgets/simple_snackbar.dart';
 import 'package:inxtamanager/widgets/download_progress.dart';
@@ -38,10 +39,10 @@ class _HomePageState extends State<HomePage> {
       BaseController.to.loading.value = false;
 
       // calling once at app launch
-      AppVersionInfoService.getAppInfo();
+      AppVersionController.to.getAppInfo();
       // calling _getAppInfo every 15 seconds
       Timer.periodic(Duration(seconds: 15), (timer) async {
-        await AppVersionInfoService.getAppInfo();
+        await AppVersionController.to.getAppInfo();
       });
     } catch (e) {
       final snackbar = SimpleSnackbar(context);
@@ -56,54 +57,57 @@ class _HomePageState extends State<HomePage> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-        // stack incase need to overlay elements over main UI
-        body: Stack(
-      children: [
-        // Main UI
-        Obx(
-          () => Center(
-            child: BaseController.to.loading.value
-                ? const CircularProgressIndicator()
-                : Padding(
-                    // padding entire screen
-                    padding: const EdgeInsets.symmetric(horizontal: 42),
-                    child: Column(
-                      children: [
-                        // sets top space to 14% of the screen's total height
-                        SizedBox(height: screenHeight * 0.13), // top space
+      // stack incase need to overlay elements over main UI
+      body: Stack(
+        children: [
+          // Main UI
+          Obx(
+            () => Center(
+              child: BaseController.to.loading.value
+                  ? const CircularProgressIndicator()
+                  : Padding(
+                      // padding entire screen
+                      padding: const EdgeInsets.symmetric(horizontal: 42),
+                      child: Column(
+                        children: [
+                          // sets top space to 14% of the screen's total height
+                          SizedBox(height: screenHeight * 0.13), // top space
 
-                        LogoWithName(),
+                          LogoWithName(),
 
-                        SizedBox(height: 14), // spacer
+                          SizedBox(height: 14), // spacer
 
-                        AppversioninfoText(),
+                          AppversioninfoText(),
 
-                        SizedBox(
-                            height: BaseController.to.isAppInstalled.value
+                          SizedBox(
+                            height: AppVersionController.to.isAppInstalled.value
                                 ? 24
-                                : 16), // spacer
+                                : 16,
+                          ), // spacer
 
-                        VersionDropdown(),
+                          VersionDropdown(),
 
-                        SizedBox(height: 20), // spacer
+                          SizedBox(height: 20), // spacer
 
-                        DownloadUninstallFilesButtons(),
+                          HomeButtons(),
 
-                        // showing progressbar when downloading
-                        if (BaseController.to.isDownloading.value)
-                          DownloadProgress(
+                          // showing progressbar when downloading
+                          if (DownloadController.to.isDownloading.value)
+                            DownloadProgress(
                               progress:
-                                  BaseController.to.downloadProgress.value),
+                                  DownloadController.to.downloadProgress.value,
+                            ),
 
-                        SizedBox(height: 15), // spacer
+                          SizedBox(height: 15), // spacer
 
-                        ChangelogText()
-                      ],
+                          ChangelogText()
+                        ],
+                      ),
                     ),
-                  ),
+            ),
           ),
-        )
-      ],
-    ));
+        ],
+      ),
+    );
   }
 }
