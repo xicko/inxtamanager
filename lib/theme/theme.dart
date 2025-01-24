@@ -23,7 +23,7 @@ ThemeData lightMode = ThemeData(
       backgroundColor: Color.fromARGB(255, 38, 38, 38),
       foregroundColor: Colors.white,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(6),
       ),
     ),
   ),
@@ -39,8 +39,29 @@ ThemeData lightMode = ThemeData(
   ),
 
   dropdownMenuTheme: DropdownMenuThemeData(
+    inputDecorationTheme: InputDecorationTheme(
+      fillColor: Colors.white,
+      filled: true,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+    ),
     menuStyle: MenuStyle(
+      padding: WidgetStateProperty.all(
+        EdgeInsets.all(0),
+      ),
       backgroundColor: WidgetStateProperty.all(Colors.white),
+      elevation: WidgetStateProperty.all(10),
+      shape: WidgetStateProperty.all(
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(0),
+            topRight: Radius.circular(0),
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
+          ),
+        ),
+      ),
     ),
   ),
 
@@ -101,8 +122,29 @@ ThemeData darkMode = ThemeData(
   ),
 
   dropdownMenuTheme: DropdownMenuThemeData(
+    inputDecorationTheme: InputDecorationTheme(
+      fillColor: Colors.black,
+      filled: false,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+    ),
     menuStyle: MenuStyle(
+      padding: WidgetStateProperty.all(
+        EdgeInsets.all(0),
+      ),
       backgroundColor: WidgetStateProperty.all(Colors.black),
+      elevation: WidgetStateProperty.all(10),
+      shape: WidgetStateProperty.all(
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(0),
+            topRight: Radius.circular(0),
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
+          ),
+        ),
+      ),
     ),
   ),
 

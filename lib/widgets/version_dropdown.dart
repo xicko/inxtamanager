@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:inxtamanager/controllers/base_controller.dart';
+import 'package:inxtamanager/theme/colors.dart';
 
 class VersionDropdown extends StatelessWidget {
   const VersionDropdown({super.key});
@@ -17,16 +18,19 @@ class VersionDropdown extends StatelessWidget {
             onSelected: (String? newValue) {
               BaseController.to.selectedVersion.value = newValue;
             },
-            label: const Text(
+            label: Text(
               'Select Version',
               style: TextStyle(
                 fontFamily: 'InstagramSans',
                 fontWeight: FontWeight.w500,
                 fontSize: 20,
+                color: AppColors.bw100(Theme.of(context).brightness),
               ),
             ),
             textStyle: TextStyle(
               fontSize: 20,
+              fontWeight: FontWeight.w500,
+              color: AppColors.bw100(Theme.of(context).brightness),
             ),
             dropdownMenuEntries: BaseController.to.versions
                 .map(
@@ -35,9 +39,10 @@ class VersionDropdown extends StatelessWidget {
                     label: version.label,
                     labelWidget: Text(
                       version.label,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'InstagramSans',
                         fontSize: 20,
+                        color: AppColors.bw100(Theme.of(context).brightness),
                       ),
                     ),
                   ),

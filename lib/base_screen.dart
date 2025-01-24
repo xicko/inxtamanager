@@ -16,11 +16,38 @@ class BaseScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Obx(
-        () => IndexedStack(
-          index: BaseController.to.navIndex.value,
-          children: const [
-            HomeNav(),
-            HelpNav(),
+        () => Stack(
+          children: [
+            IndexedStack(
+              index: BaseController.to.navIndex.value,
+              children: const [
+                HomeNav(),
+                HelpNav(),
+              ],
+            ),
+
+            // Custom shadow for navbar
+            Positioned(
+              bottom: 0,
+              child: Container(
+                height: 0,
+                width: MediaQuery.of(context).size.width,
+                decoration: BoxDecoration(
+                  color: Colors.amber,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      spreadRadius: 26,
+                      blurRadius: 48,
+                      offset: Offset(
+                        0,
+                        5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
           ],
         ),
       ),

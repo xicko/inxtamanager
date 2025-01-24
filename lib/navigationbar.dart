@@ -9,7 +9,6 @@ class BottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(
       () => NavigationBar(
-        elevation: 10,
         selectedIndex: BaseController.to.navIndex.value,
         onDestinationSelected: (index) => BaseController.to.changePage(index),
         destinations: [

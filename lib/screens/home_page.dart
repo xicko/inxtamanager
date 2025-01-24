@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inxtamanager/controllers/app_version_controller.dart';
 import 'package:inxtamanager/controllers/base_controller.dart';
-import 'package:inxtamanager/controllers/download_controller.dart';
 import 'package:inxtamanager/widgets/appversioninfo_text.dart';
-import 'package:inxtamanager/widgets/changelogtext.dart';
+import 'package:inxtamanager/widgets/changelog.dart';
 import 'package:inxtamanager/widgets/home_buttons.dart';
 import 'package:inxtamanager/widgets/logo_with_name.dart';
 import 'package:inxtamanager/widgets/simple_snackbar.dart';
@@ -29,8 +28,7 @@ class _HomePageState extends State<HomePage> {
     initializeApp();
   }
 
-// ===========================================================
-  // initializing at app startup
+  // Initializing at app startup
   Future<void> initializeApp() async {
     try {
       final fetchedVersions = await _versionService.fetchVersions();
@@ -63,47 +61,45 @@ class _HomePageState extends State<HomePage> {
           // Main UI
           Obx(
             () => Center(
-              child: BaseController.to.loading.value
-                  ? const CircularProgressIndicator()
-                  : Padding(
-                      // padding entire screen
-                      padding: const EdgeInsets.symmetric(horizontal: 42),
-                      child: Column(
-                        children: [
-                          // sets top space to 14% of the screen's total height
-                          SizedBox(height: screenHeight * 0.13), // top space
+              child: AnimatedOpacity(
+                curve: Curves.easeInQuad,
+                opacity: BaseController.to.loading.value ? 0 : 1,
+                duration: Duration(milliseconds: 600),
+                child: Padding(
+                  // padding entire screen
+                  padding: const EdgeInsets.symmetric(horizontal: 42),
+                  child: Column(
+                    children: [
+                      // sets top space to 14% of the screen's total height
+                      SizedBox(height: screenHeight * 0.08), // top space
 
-                          LogoWithName(),
+                      LogoWithName(),
 
-                          SizedBox(height: 14), // spacer
+                      SizedBox(height: 14), // spacer
 
-                          AppversioninfoText(),
+                      AppversioninfoText(),
 
-                          SizedBox(
-                            height: AppVersionController.to.isAppInstalled.value
-                                ? 24
-                                : 16,
-                          ), // spacer
+                      SizedBox(
+                        height: AppVersionController.to.isAppInstalled.value
+                            ? 24
+                            : 16,
+                      ), // spacer
 
-                          VersionDropdown(),
+                      VersionDropdown(),
 
-                          SizedBox(height: 20), // spacer
+                      SizedBox(height: 20), // spacer
 
-                          HomeButtons(),
+                      HomeButtons(),
 
-                          // showing progressbar when downloading
-                          if (DownloadController.to.isDownloading.value)
-                            DownloadProgress(
-                              progress:
-                                  DownloadController.to.downloadProgress.value,
-                            ),
+                      DownloadProgress(),
 
-                          SizedBox(height: 15), // spacer
+                      SizedBox(height: 20), // spacer
 
-                          ChangelogText()
-                        ],
-                      ),
-                    ),
+                      ChangeLog()
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
         ],

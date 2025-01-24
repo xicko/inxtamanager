@@ -19,7 +19,7 @@ class LogoWithName extends StatelessWidget {
           'Inxta Manager',
           style: TextStyle(
             fontFamily: 'InstagramSansHeadline',
-            fontSize: 36,
+            fontSize: 32,
             fontWeight: FontWeight.w700,
             color: AppColors.titleTextColor(Theme.of(context).brightness),
           ),

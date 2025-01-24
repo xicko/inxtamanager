@@ -23,14 +23,21 @@ class SimpleSnackbar {
 
     if (context.mounted) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(
+          .showSnackBar(
+            SnackBar(
               behavior: SnackBarBehavior.fixed,
               duration: Duration(seconds: 2),
               content: Center(
-                child: Text(message,
-                    style:
-                        TextStyle(fontFamily: 'InstagramSans', fontSize: 16)),
-              )))
+                child: Text(
+                  message,
+                  style: TextStyle(
+                    fontFamily: 'InstagramSans',
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ),
+          )
           .closed
           .then(
         (_) {
